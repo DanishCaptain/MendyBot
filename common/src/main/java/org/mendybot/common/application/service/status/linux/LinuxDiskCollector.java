@@ -12,8 +12,8 @@ import org.mendybot.common.exception.ExecuteException;
  * This class is used to process temperature information obtained from the OpenManage service on a Linux box
  * <pre>
  * <B>History
- * Date     Author         Description/Justification</B>
- * 04/13/10 Brian Sorensen TO-104 GDIS-R - Initial code.
+ * Date        Author         Description/Justification</B>
+ * 11 Mar 2018 Brian Sorensen ENG-100 - Initial code.
  * </pre>
  */
 public class LinuxDiskCollector extends LinuxCollector

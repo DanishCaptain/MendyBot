@@ -6,8 +6,8 @@ import java.io.Serializable;
  * This class holds the address value that may be chained to other HierarchyAddress objects.
  * <pre>
  * <B>History
- * Date     Author         Description/Justification</B>
- * 04/13/10 Brian Sorensen TO-104 GDIS-R - Initial code.
+ * Date        Author         Description/Justification</B>
+ * 11 Mar 2018 Brian Sorensen ENG-100 - Initial code.
  * </pre>
  */
 public class HierarchyAddress implements Comparable<HierarchyAddress>, Serializable

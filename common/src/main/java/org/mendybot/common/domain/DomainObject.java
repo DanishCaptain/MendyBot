@@ -14,13 +14,11 @@ import org.mendybot.common.application.log.Logger;
  * defined by a DomainDefinition and its DomainAttributes
  * <pre>
  * <B>History
- * Date     Author         Description/Justification</B>
- * 04/13/10 Brian Sorensen TO-104 GDIS-R - Initial code.
- * 05/31/10 Brian Sorensen TO-104 GDIS-R - Fixed restore to defaults
- * 08/11/10 Brian Sorensen IDR GDISR30
+ * Date        Author         Description/Justification</B>
+ * 11 Mar 2018 Brian Sorensen ENG-100 - Initial code.
  * </pre>
- * @see gov.nasa.wsc.ssc.domain.DomainDefinition
- * @see gov.nasa.wsc.ssc.domain.DomainAttribute
+ * @see org.mendybot.common.domain.DomainDefinition
+ * @see org.mendybot.common.domain.DomainAttribute
  */
 public class DomainObject
 {

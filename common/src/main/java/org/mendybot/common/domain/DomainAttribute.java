@@ -9,9 +9,8 @@ import org.mendybot.common.exception.ExecuteException;
  * This class is used to define the type of data used in data collection.
  * <pre>
  * <B>History
- * Date     Author         Description/Justification</B>
- * 04/13/10 Brian Sorensen TO-104 GDIS-R - Initial code.
- * 08/11/10 Brian Sorensen IDR GDISR30
+ * Date        Author         Description/Justification</B>
+ * 11 Mar 2018 Brian Sorensen ENG-100 - Initial code.
  * </pre>
  */
 public abstract class DomainAttribute implements Serializable

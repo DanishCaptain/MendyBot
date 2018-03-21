@@ -8,9 +8,8 @@ import org.mendybot.common.exception.ExecuteException;
  * This class is used to collect or monitor values from a data source.
  * <pre>
  * <B>History
- * Date     Author         Description/Justification</B>
- * 04/13/10 Brian Sorensen TO-104 GDIS-R - Initial code.
- * 07/25/11 Brian Sorensen DR#59958 CR#WSC001249 - prune can not handle large data set deletes
+ * Date        Author         Description/Justification</B>
+ * 11 Mar 2018 Brian Sorensen ENG-100 - Initial code.
  * </pre>
  */
 public abstract class ValueCollector

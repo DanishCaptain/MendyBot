@@ -18,9 +18,8 @@ import org.mendybot.common.exception.ExecuteException;
  * provided properties.
  * <pre>
  * <B>History
- * Date     Author         Description/Justification</B>
- * 04/13/10 Brian Sorensen TO-104 GDIS-R - Initial code.
- * 05/20/10 Brian Sorensen Inspection clean-up
+ * Date        Author         Description/Justification</B>
+ * 11 Mar 2018 Brian Sorensen ENG-100 - Initial code.
  * </pre>
  */
 public class Logger
