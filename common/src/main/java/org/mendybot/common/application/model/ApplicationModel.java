@@ -1,41 +1,304 @@
 package org.mendybot.common.application.model;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.lang.reflect.Constructor;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+
+import org.mendybot.common.application.Application;
 import org.mendybot.common.application.log.Logger;
-import org.mendybot.common.application.model.properties.DomainPropertySourceNotFoundException;
-import org.mendybot.common.application.model.properties.PropertyManager;
-import org.mendybot.common.domain.DomainModel;
+import org.mendybot.common.application.model.widget.Widget;
+import org.mendybot.common.application.model.widget.time.TimekeeperWidget;
 import org.mendybot.common.exception.ExecuteException;
+import org.mendybot.common.role.MendyAppRole;
+import org.mendybot.common.role.console.ConsoleRole;
+import org.mendybot.common.role.console.HeadlessConsole;
+import org.mendybot.common.role.system.SingleServer;
+import org.mendybot.common.role.system.SystemRole;
 
 public class ApplicationModel
 {
-  private Logger LOG = Logger.getInstance(ApplicationModel.class);
-  public static final String APPLICATION_PROPERTES = "APP";
-  private PropertyManager properties;
-  private DomainModel domain;
+  private static final Logger LOG = Logger.getInstance(ApplicationModel.class);
+  private Properties config = new Properties();
+  private Properties properties = new Properties();
+  private ArrayList<MendyAppRole> roles = new ArrayList<MendyAppRole>();
+  private HashMap<String, Widget> widgetsM = new HashMap<String, Widget>();
+  private ArrayList<Widget> widgetsL = new ArrayList<Widget>();
+  private Application application;
+  private File dir;
 
-  public ApplicationModel(String name) throws ExecuteException
+  public ApplicationModel(Application application) throws ExecuteException
   {
-    properties = new PropertyManager();
-    try
+    this.application=application;
+    LOG.logDebug("()", "called");
+    boolean testMode = System.getProperty("TEST-MODE") != null;
+    loadConfig();
+    loadProperties(application.getName(), testMode);
+    File logFile;
+    if (testMode)
     {
-      properties.init(APPLICATION_PROPERTES, name + ".properties");
+      logFile = new File("var/log/MB_"+application.getName()+"_");
+    } else {
+      logFile = new File("/var/log/MB_"+application.getName()+"_");
     }
-    catch (DomainPropertySourceNotFoundException e)
-    {
-      LOG.logWarning("()", e);
-    }
-    
-    domain = DomainModel.lookup(name);
+    Logger.init(logFile.getAbsolutePath(), properties);
+    LOG.logInfo("()", "test-mode: "+testMode);
+    initSystemRole(roles);
+    initConsoleRole(roles);
+    initApplicationRoles(roles);
+    initWidgets(widgetsM, widgetsL);
   }
 
-  /**
-   * This method returns the model
-   * 
-   * @return DomainModel
-   */
-  public final DomainModel getDomain()
+  private void loadConfig() throws ExecuteException
   {
-    return domain;
+    InputStream is = getClass().getClassLoader().getResourceAsStream("mendy-config.properties");
+    if (is != null) {
+      try
+      {
+        config.load(is);
+        is.close();
+      }
+      catch (IOException e)
+      {
+        throw new ExecuteException("mendy-config.properties", e);
+      }
+      
+    } else {
+      throw new ExecuteException("mendy-config.properties file is missing.");
+    }
+  }
+
+  private void loadProperties(String name, boolean testMode) throws ExecuteException
+  {
+    if (testMode) {
+      dir = new File("etc/mendybot");
+    } else {
+      dir = new File("/etc/mendybot");
+    }
+    File file = new File(dir, "MB_"+name+".properties");
+    if (file.exists()) {
+      try
+      {
+        InputStream is = new FileInputStream(file);
+        properties.load(is);
+        is.close();
+      }
+      catch (Exception e)
+      {
+        throw new ExecuteException(file.getName(), e);
+      }
+      
+    } else {
+      throw new ExecuteException("configuration .properties file is missing: "+file.getAbsolutePath());
+    }
+  }
+
+  private void initSystemRole(List<MendyAppRole> roles) throws ExecuteException
+  {
+    try
+    {
+      String name = getConfigProperty("system-role-class");
+      if (name != null)
+      {
+        @SuppressWarnings("unchecked")
+        Class<? extends SystemRole> c = (Class<? extends SystemRole>) Class.forName(name);
+        Constructor<? extends SystemRole> cc = c.getConstructor(new Class[]{ApplicationModel.class,});
+        roles.add(cc.newInstance(new Object[]{this,}));
+      }
+      else
+      {
+        roles.add(new SingleServer(this));
+      }
+    }
+    catch (Exception e)
+    {
+      throw new ExecuteException(e);
+    }
+  }
+
+  private void initConsoleRole(List<MendyAppRole> roles) throws ExecuteException
+  {
+    try
+    {
+      String name = getConfigProperty("console-role-class");
+      if (name == null) 
+      {
+        name = getProperty("console-role-class");
+      }
+      if (name != null) 
+      {
+        @SuppressWarnings("unchecked")
+        Class<? extends ConsoleRole> c = (Class<? extends ConsoleRole>) Class.forName(name);
+        Constructor<? extends ConsoleRole> cc = c.getConstructor(new Class[]{ApplicationModel.class,});
+        roles.add(cc.newInstance(new Object[]{this,}));
+      }
+      else
+      {
+        roles.add(new HeadlessConsole(this));
+      }
+    }
+    catch (Exception e)
+    {
+      throw new ExecuteException(e);
+    }
+  }
+
+  private void initApplicationRoles(List<MendyAppRole> roles) throws ExecuteException
+  {
+    try
+    {
+      List<String> names = getConfigProperties("application-role-class");
+      names.addAll(getProperties("application-role-class"));
+      
+      for (String className : names) {
+        @SuppressWarnings("unchecked")
+        Class<? extends SystemRole> c = (Class<? extends SystemRole>) Class.forName(className);
+        Constructor<? extends SystemRole> cc = c.getConstructor(new Class[]{ApplicationModel.class,});
+        roles.add(cc.newInstance(new Object[]{this,}));
+      }
+    }
+    catch (Exception e)
+    {
+      throw new ExecuteException(e);
+    }
+  }
+
+  private void initWidgets(Map<String, Widget> map, List<Widget> list) throws ExecuteException
+  {
+    try
+    {
+      List<String> names = getConfigProperties("widget-name");
+      names.addAll(getProperties("widget-name"));
+      List<String> classNames = getConfigProperties("widget-class");
+      classNames.addAll(getProperties("widget-class"));
+
+      for (int i=0; i<names.size(); i++)
+      {
+        String name = names.remove(i);
+        String className = classNames.get(i);
+        @SuppressWarnings("unchecked")
+        Class<? extends Widget> c = (Class<? extends Widget>) Class.forName(className);
+        Constructor<? extends Widget> cc = c.getConstructor(new Class[]{ApplicationModel.class, String.class,});
+        Widget w = cc.newInstance(new Object[]{this, name});
+        map.put(name, w);
+        list.add(w);
+      }
+    }
+    catch (Exception e)
+    {
+      throw new ExecuteException(e);
+    }
+  }
+
+  public Widget lookupWidget(String name)
+  {
+    return widgetsM.get(name);
+  }
+
+  public void init() throws ExecuteException
+  {
+    for (MendyAppRole role : roles) {
+      role.init();
+    }
+    for (Widget widget : widgetsL) {
+      widget.init();
+    }
+  }
+
+  public void start() throws ExecuteException
+  {
+    for (MendyAppRole role : roles) {
+      role.start();
+    }
+    for (Widget widget : widgetsL) {
+      widget.start();
+    }
+  }
+
+  public void stop()
+  {
+    for (MendyAppRole role : roles) {
+      role.stop();
+    }
+    for (Widget widget : widgetsL) {
+      widget.stop();
+    }
+  }
+
+  private String getConfigProperty(String key)
+  {
+    return config.getProperty(key);
+  }
+
+  private String getConfigProperty(String key, String defaultValue)
+  {
+    String v = getConfigProperty(key);
+    if (v == null) {
+      return defaultValue;
+    } else {
+      return v;
+    }
+  }
+
+  private List<String> getConfigProperties(String key)
+  {
+    ArrayList<String> list = new ArrayList<String>();
+    int index = 1;
+    while (true) {
+      String val = getConfigProperty(key+"_"+(index++));
+      if (val == null) {
+        break;
+      } else {
+        list.add(val);
+      }
+    }
+    return list;
+  }
+
+  public String getProperty(String key)
+  {
+    return properties.getProperty(key);
+  }
+
+  public String getProperty(String key, String defaultValue)
+  {
+    String v = getProperty(key);
+    if (v == null) {
+      return defaultValue;
+    } else {
+      return v;
+    }
+  }
+
+  public List<String> getProperties(String key)
+  {
+    ArrayList<String> list = new ArrayList<String>();
+    int index = 1;
+    while (true) {
+      String val = getProperty(key+"_"+(index++));
+      if (val == null) {
+        break;
+      } else {
+        list.add(val);
+      }
+    }
+    return list;
+  }
+
+  public String getName()
+  {
+    return application.getName();
+  }
+
+  public void stopApplication()
+  {
+    application.applicationStop();
   }
 
 }

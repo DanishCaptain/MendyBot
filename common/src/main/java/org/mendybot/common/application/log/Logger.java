@@ -3,14 +3,13 @@ package org.mendybot.common.application.log;
 import java.io.CharArrayWriter;
 import java.io.PrintWriter;
 import java.util.HashMap;
+import java.util.Properties;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.FileHandler;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.SimpleFormatter;
 
-import org.mendybot.common.application.model.ApplicationModel;
-import org.mendybot.common.application.model.properties.PropertyManager;
 import org.mendybot.common.exception.ExecuteException;
 
 /**
@@ -29,7 +28,7 @@ public class Logger
   private static FileHandler                                fh;
   private static HashMap<java.util.logging.Logger, LogMode> modeMap      = new HashMap<java.util.logging.Logger, LogMode>();
   private static ConsoleHandler                             ch;
-  private static String                                     fileNameBase = "Logger";
+  private static String fileNameBase = "Logger";
   private java.util.logging.Logger                          logger;
   private Class<?>                                          c;
 
@@ -47,9 +46,10 @@ public class Logger
    * This method is used to initialize the logger using the given property set
    * @param ps The property set to use for initialization values
    * @param logFileBase The directory path for the log file storage
+   * @param p 
    * @throws ExecuteException
    */
-  public static void init(PropertyManager ps, String logFileBase)
+  public static void init(String logFileBase, Properties p)
       throws ExecuteException
   {
     Logger.fileNameBase = logFileBase;
@@ -60,9 +60,9 @@ public class Logger
       log.removeHandler(hList[i]);
     }
 
-    LogMode mode = LogMode.valueOf(ps.lookup(ApplicationModel.APPLICATION_PROPERTES).getProperty("Log_Mode", "FILE"));
+    LogMode mode = LogMode.valueOf(p.getProperty("log-mode", "FILE"));
     setMode(log, mode);
-    LogLevel level = LogLevel.valueOf(ps.lookup(ApplicationModel.APPLICATION_PROPERTES).getProperty("Log_Level", "INFO"));
+    LogLevel level = LogLevel.valueOf(p.getProperty("log-level", "INFO"));
     setLevel(log, level);
   }
 
