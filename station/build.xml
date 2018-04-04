@@ -7,6 +7,7 @@
 	<property name="test.build.dir" value="target/test" />
 	<property name="lib.dir" value="target/lib" />
 	<property name="master.lib.dir" value="../target/lib" />
+	<property name="main-class" value="org.mendybot.common.application.Application" />
 	<property name="jar.file" value="${lib.dir}/station.jar" />
 
 	<target name="clean">
@@ -30,6 +31,11 @@
 
 	<target name="jar" depends="compile">
 		<mkdir dir="${lib.dir}" />
+		<copy todir="${build.dir}" flatten="true">
+		    <fileset dir="${src.resources}">
+		            <include name="**/*.properties"/>
+		    </fileset>
+		</copy>
 		<jar destfile="${jar.file}" basedir="${build.dir}">
 			<zipgroupfileset dir="${lib.dir}" includes="*.jar" />
 			<zipgroupfileset dir="${master.lib.dir}" includes="common.jar" />
