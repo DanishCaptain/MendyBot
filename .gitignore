@@ -1,4 +1,13 @@
 /bin/
 /.settings/
 /.classpath
-/.project
+#/.project
+/3p
+/src_w/
+/target/
+common/src_w
+console/src_w
+console/var
+hub/var
+station/src_w
+station/var
