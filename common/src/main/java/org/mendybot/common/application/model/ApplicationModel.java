@@ -14,11 +14,10 @@ import java.util.Properties;
 import org.mendybot.common.application.Application;
 import org.mendybot.common.application.log.Logger;
 import org.mendybot.common.application.model.widget.Widget;
-import org.mendybot.common.application.model.widget.time.TimekeeperWidget;
 import org.mendybot.common.exception.ExecuteException;
 import org.mendybot.common.role.MendyAppRole;
 import org.mendybot.common.role.console.ConsoleRole;
-import org.mendybot.common.role.console.HeadlessConsole;
+import org.mendybot.common.role.console.headless.HeadlessConsole;
 import org.mendybot.common.role.system.SingleServer;
 import org.mendybot.common.role.system.SystemRole;
 

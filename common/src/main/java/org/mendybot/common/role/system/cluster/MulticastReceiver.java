@@ -75,11 +75,11 @@ public class MulticastReceiver implements Runnable
         DatagramPacket packet = new DatagramPacket(buf, buf.length, group, port);
         socket.receive(packet);
         StringTokenizer st = new StringTokenizer(new String(packet.getData()), "|");
-        Heartbeat hb = new Heartbeat(st.nextToken(), System.currentTimeMillis());
+        Heartbeat hb = new Heartbeat(Integer.parseInt(st.nextToken()), st.nextToken(), System.currentTimeMillis());
         hb.setSequence(Integer.parseInt(st.nextToken()));
         hb.setTimestamp(Long.parseLong(st.nextToken()));
-        hb.setStatus(st.nextToken());
-        hb.setClusterStatus(st.nextToken());
+        hb.setStatus(NodeStatus.valueOf(st.nextToken()));
+        hb.setClusterStatus(ClusterRoleStatus.valueOf(st.nextToken()));
         manager.processHeartbeat(hb);
       }
       catch (IOException e)

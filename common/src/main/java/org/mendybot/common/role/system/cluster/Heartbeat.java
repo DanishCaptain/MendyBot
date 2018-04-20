@@ -1,22 +1,24 @@
 package org.mendybot.common.role.system.cluster;
 
-public class Heartbeat
+public class Heartbeat implements Comparable<Heartbeat>
 {
   private String name;
   private int sequence;
   private long ts;
-  private String status;
-  private String clusterStatus;
+  private NodeStatus status;
+  private ClusterRoleStatus clusterStatus;
   private long receivedTS;
+  private int clusterPriority;
 
-  public Heartbeat(String name)
+  public Heartbeat(int clusterPriority, String name)
   {
+    this.clusterPriority = clusterPriority;
     this.name = name;
   }
 
-  public Heartbeat(String name, long receivedTS)
+  public Heartbeat(int clusterPriority, String name, long receivedTS)
   {
-    this(name);
+    this(clusterPriority, name);
     this.receivedTS = receivedTS;
   }
 
@@ -50,20 +52,36 @@ public class Heartbeat
     return receivedTS;
   }
 
-  public void setStatus(String status)
+  public void setStatus(NodeStatus status)
   {
     this.status=status;
   }
 
-  public void setClusterStatus(String clusterStatus)
+  public NodeStatus setStatus()
+  {
+    return status;
+  }
+
+  public void setClusterStatus(ClusterRoleStatus clusterStatus)
   {
     this.clusterStatus=clusterStatus;
+  }
+
+  public ClusterRoleStatus getClusterStatus()
+  {
+    return clusterStatus;
   }
 
   @Override
   public String toString()
   {
-    return "|"+name+"|"+(sequence++)+"|"+ts+"|"+status+"|"+clusterStatus+"|";
+    return "|"+clusterPriority+"|"+name+"|"+(sequence++)+"|"+ts+"|"+status+"|"+clusterStatus+"|";
+  }
+
+  @Override
+  public int compareTo(Heartbeat o)
+  {
+    return Integer.compare(clusterPriority, o.clusterPriority);
   }
 
 }

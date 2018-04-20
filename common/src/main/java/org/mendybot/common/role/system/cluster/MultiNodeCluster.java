@@ -7,10 +7,13 @@ public class MultiNodeCluster extends ClusterRole
 {
   private static final Logger LOG = Logger.getInstance(MultiNodeCluster.class);
   private int sequence=1;
+  private ClusterRoleStatus crs = ClusterRoleStatus.UNKNOWN;
+  private int clusterPriority;
 
   public MultiNodeCluster(ApplicationModel model)
   {
     super(model);
+    clusterPriority = Integer.parseInt(model.getProperty("cluster-priority", Integer.toString(Integer.MAX_VALUE)));
   }
 
   @Override
@@ -25,14 +28,25 @@ public class MultiNodeCluster extends ClusterRole
     if (sequence > 100) {
       sequence = 0;
     }
-    String status = "GOOD";
-    String clusterStatus = "UNKN";
-    Heartbeat hb = new Heartbeat(getModel().getName());
+    NodeStatus status = NodeStatus.GOOD;
+    Heartbeat hb = new Heartbeat(clusterPriority, getModel().getName());
     hb.setSequence(sequence++);
     hb.setTimestamp(System.currentTimeMillis());
     hb.setStatus(status);
-    hb.setClusterStatus(clusterStatus);
+    hb.setClusterStatus(crs);
     return hb;
+  }
+
+  @Override
+  public void setRoleStatus(ClusterRoleStatus crs)
+  {
+    this.crs = crs;
+  }
+
+  @Override
+  public ClusterRoleStatus getRoleStatus()
+  {
+    return crs;
   }
 
 }

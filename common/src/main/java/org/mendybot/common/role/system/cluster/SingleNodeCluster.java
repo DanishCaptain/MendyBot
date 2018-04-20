@@ -6,6 +6,7 @@ import org.mendybot.common.application.model.ApplicationModel;
 public class SingleNodeCluster extends ClusterRole
 {
   private static final Logger LOG = Logger.getInstance(SingleNodeCluster.class);
+  private ClusterRoleStatus crs = ClusterRoleStatus.UNKNOWN;
 
   public SingleNodeCluster(ApplicationModel model)
   {
@@ -21,7 +22,19 @@ public class SingleNodeCluster extends ClusterRole
   @Override
   public Heartbeat createHeartbeat()
   {
-    return new Heartbeat("single node - fix me");
+    return new Heartbeat(1, "single node - fix me");
+  }
+
+  @Override
+  public void setRoleStatus(ClusterRoleStatus crs)
+  {
+    this.crs = crs;
+  }
+
+  @Override
+  public ClusterRoleStatus getRoleStatus()
+  {
+    return crs;
   }
 
 }

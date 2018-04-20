@@ -1,6 +1,9 @@
 package org.mendybot.common.role.system.cluster;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.Map.Entry;
 import java.util.concurrent.ArrayBlockingQueue;
 
 import org.mendybot.common.application.log.Logger;
@@ -12,6 +15,8 @@ public abstract class ClusterManager implements Runnable
   private ArrayBlockingQueue<Heartbeat> queue = new ArrayBlockingQueue<Heartbeat>(10);
   private HashMap<String, Heartbeat> hbMap = new HashMap<String, Heartbeat>();
   private Thread t = new Thread(this);
+  private int deadtime;
+  private int warntime;
 
   private ClusterRole cluster;
 
@@ -29,13 +34,15 @@ public abstract class ClusterManager implements Runnable
   }
 
   public final void init() throws ExecuteException {
+    deadtime = 1000 * Integer.parseInt(cluster.getModel().getProperty("deadtime", "10"));
+    warntime = 1000 * Integer.parseInt(cluster.getModel().getProperty("warntime", "5"));
     initManager();
   }
 
   protected abstract void initManager() throws ExecuteException;
 
   public final void start() throws ExecuteException {
-    System.out.println(getClass().getSimpleName()+" starting ...");
+    LOG.logDebug("start", "called");
     startManager();
     if (!running) {
       t.start();
@@ -45,7 +52,7 @@ public abstract class ClusterManager implements Runnable
   protected abstract void startManager() throws ExecuteException;
   
   public final void stop() {
-    System.out.println(getClass().getSimpleName()+" stopping ...");
+    LOG.logDebug("stop", "called");
     stopManager();
     if (!running) {
       t.start();
@@ -67,24 +74,58 @@ public abstract class ClusterManager implements Runnable
         hbMap.put(hb.getName(), hb);
         if (previous != null) {
           int delta = hb.getSequence() - previous.getSequence();
-          System.out.println(delta);
           if (hb.getSequence() > 0 && delta != 0) {
-            System.out.println("<--(Q)"+hb+" missing: "+delta+"  "+hb.getSequence()+":"+previous.getSequence());
+            LOG.logDebug("run", "<--(Q)"+hb+" missing: "+delta+"  "+hb.getSequence()+":"+previous.getSequence());
           } else {
-            System.out.println("<--(Q)"+hb);
-            System.out.println("sinceLast: "+(hb.getTimestamp()-previous.getTimestamp()));
-            System.out.println("inTransit: "+(hb.getReceivedTimestamp()-hb.getTimestamp()));
+            LOG.logDebug("run", "<--(Q)"+hb);
+            LOG.logDebug("run", "sinceLast: "+(hb.getTimestamp()-previous.getTimestamp()));
+            LOG.logDebug("run", "inTransit: "+(hb.getReceivedTimestamp()-hb.getTimestamp()));
           }
         } else {
-          System.out.println("initial contact with: "+hb.getName());
+          LOG.logInfo("run", "initial contact with: "+hb.getName());
         }
+        long now = System.currentTimeMillis();
+        ArrayList<Heartbeat> expired = new ArrayList<Heartbeat>();
+        boolean hasPrime = cluster.getRoleStatus() == ClusterRoleStatus.PRIME;
+        for(Entry<String, Heartbeat> e : hbMap.entrySet()) {
+          if (now - e.getValue().getTimestamp() >= deadtime) {
+            expired.add(e.getValue());
+          } else if (now - e.getValue().getTimestamp() >= warntime) {
+            LOG.logInfo("run", "lost contact with: "+e.getValue().getName());
+          } else {
+            hasPrime = hasPrime || e.getValue().getClusterStatus() == ClusterRoleStatus.PRIME;
+          }
+        }
+        for (Heartbeat whb : expired) {
+          hbMap.remove(whb.getName());
+        }
+        if (!hasPrime && previous != null) {
+          ArrayList<Heartbeat> w = new ArrayList<Heartbeat>(hbMap.values());
+          Collections.sort(w);
+          Heartbeat newPrime = w.get(0);
+          if (cluster.getAppName().equals(newPrime.getName())) {
+            cluster.setRoleStatus(ClusterRoleStatus.PRIME);
+            LOG.logInfo("run", "PRIME assumed");
+          }
+        }
+        if (cluster.getRoleStatus() == ClusterRoleStatus.UNKNOWN) {
+          cluster.setRoleStatus(ClusterRoleStatus.SLAVE);
+          LOG.logInfo("run", "SLAVE assumed");
+        }
+        
+//        if (!hasPrime && previous != null) {
+//          LOG.logInfo("run", "no prime detected.");
+//          cluster.setRoleStatus(ClusterRoleStatus.PRIME);
+//          LOG.logInfo("run", "PRIME assumed");
+//        } else {
+//        }
+        Thread.yield();
       }
       catch (InterruptedException e)
       {
         running = false;
         break;
       }
-      Thread.yield();
     }
   }
 

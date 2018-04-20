@@ -1,15 +1,15 @@
-package org.mendybot.common.role.console;
+package org.mendybot.common.role.console.lightweight;
 
 import org.mendybot.common.application.log.Logger;
 import org.mendybot.common.application.model.ApplicationModel;
 import org.mendybot.common.exception.ExecuteException;
-import org.mendybot.common.role.system.SingleServer;
+import org.mendybot.common.role.console.ConsoleRole;
 
-public class HeadlessConsole extends ConsoleRole
+public class LightWeightConsole extends ConsoleRole
 {
-  private static final Logger LOG = Logger.getInstance(SingleServer.class);
+  private static final Logger LOG = Logger.getInstance(LightWeightConsole.class);
 
-  public HeadlessConsole(ApplicationModel model)
+  public LightWeightConsole(ApplicationModel model)
   {
     super(model);
   }

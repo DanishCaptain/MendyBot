@@ -38,4 +38,8 @@ public abstract class ClusterRole extends SystemRole
 
   public abstract Heartbeat createHeartbeat();
 
+  public abstract void setRoleStatus(ClusterRoleStatus crs);
+
+  public abstract ClusterRoleStatus getRoleStatus();
+
 }
