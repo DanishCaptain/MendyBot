@@ -15,7 +15,9 @@ import org.mendybot.common.application.Application;
 import org.mendybot.common.application.log.Logger;
 import org.mendybot.common.application.model.widget.Widget;
 import org.mendybot.common.exception.ExecuteException;
-import org.mendybot.common.role.MendyAppRole;
+import org.mendybot.common.role.ApplicationRole;
+import org.mendybot.common.role.MendyBotRole;
+import org.mendybot.common.role.archive.FileManager;
 import org.mendybot.common.role.console.ConsoleRole;
 import org.mendybot.common.role.console.headless.HeadlessConsole;
 import org.mendybot.common.role.system.SingleServer;
@@ -26,11 +28,13 @@ public class ApplicationModel
   private static final Logger LOG = Logger.getInstance(ApplicationModel.class);
   private Properties config = new Properties();
   private Properties properties = new Properties();
-  private ArrayList<MendyAppRole> roles = new ArrayList<MendyAppRole>();
+  private ArrayList<MendyBotRole> roles = new ArrayList<MendyBotRole>();
+  private HashMap<String, ApplicationRole> appRolesM = new HashMap<String, ApplicationRole>();
   private HashMap<String, Widget> widgetsM = new HashMap<String, Widget>();
   private ArrayList<Widget> widgetsL = new ArrayList<Widget>();
   private Application application;
-  private File dir;
+  private File dirEtc;
+  private File dirOpt;
 
   public ApplicationModel(Application application) throws ExecuteException
   {
@@ -76,11 +80,13 @@ public class ApplicationModel
   private void loadProperties(String name, boolean testMode) throws ExecuteException
   {
     if (testMode) {
-      dir = new File("etc/mendybot");
+      dirEtc = new File("etc/mendybot");
+      dirOpt = new File("..");
     } else {
-      dir = new File("/etc/mendybot");
+      dirEtc = new File("/etc/mendybot");
+      dirOpt = new File("/opt/mendybot");
     }
-    File file = new File(dir, "MB_"+name+".properties");
+    File file = new File(dirEtc, "MB_"+name+".properties");
     if (file.exists()) {
       try
       {
@@ -98,7 +104,7 @@ public class ApplicationModel
     }
   }
 
-  private void initSystemRole(List<MendyAppRole> roles) throws ExecuteException
+  private void initSystemRole(List<MendyBotRole> roles) throws ExecuteException
   {
     try
     {
@@ -121,7 +127,7 @@ public class ApplicationModel
     }
   }
 
-  private void initConsoleRole(List<MendyAppRole> roles) throws ExecuteException
+  private void initConsoleRole(List<MendyBotRole> roles) throws ExecuteException
   {
     try
     {
@@ -148,7 +154,7 @@ public class ApplicationModel
     }
   }
 
-  private void initApplicationRoles(List<MendyAppRole> roles) throws ExecuteException
+  private void initApplicationRoles(List<MendyBotRole> roles) throws ExecuteException
   {
     try
     {
@@ -157,13 +163,16 @@ public class ApplicationModel
       
       for (String className : names) {
         @SuppressWarnings("unchecked")
-        Class<? extends SystemRole> c = (Class<? extends SystemRole>) Class.forName(className);
-        Constructor<? extends SystemRole> cc = c.getConstructor(new Class[]{ApplicationModel.class,});
-        roles.add(cc.newInstance(new Object[]{this,}));
+        Class<? extends ApplicationRole> c = (Class<? extends ApplicationRole>) Class.forName(className);
+        Constructor<? extends ApplicationRole> cc = c.getConstructor(new Class[]{ApplicationModel.class,});
+        ApplicationRole rr = cc.newInstance(new Object[]{this,});
+        roles.add(rr);
+        appRolesM.put(rr.getId(), rr);
       }
     }
     catch (Exception e)
     {
+      LOG.logSevere("initApplicationRole", "classes: "+getConfigProperties("application-role-class"));
       throw new ExecuteException(e);
     }
   }
@@ -202,7 +211,7 @@ public class ApplicationModel
 
   public void init() throws ExecuteException
   {
-    for (MendyAppRole role : roles) {
+    for (MendyBotRole role : roles) {
       role.init();
     }
     for (Widget widget : widgetsL) {
@@ -212,7 +221,7 @@ public class ApplicationModel
 
   public void start() throws ExecuteException
   {
-    for (MendyAppRole role : roles) {
+    for (MendyBotRole role : roles) {
       role.start();
     }
     for (Widget widget : widgetsL) {
@@ -222,7 +231,7 @@ public class ApplicationModel
 
   public void stop()
   {
-    for (MendyAppRole role : roles) {
+    for (MendyBotRole role : roles) {
       role.stop();
     }
     for (Widget widget : widgetsL) {
@@ -298,6 +307,21 @@ public class ApplicationModel
   public void stopApplication()
   {
     application.applicationStop();
+  }
+
+  public File getWorkingEtcDir()
+  {
+    return dirEtc;
+  }
+
+  public File getWorkingOptDir()
+  {
+    return dirOpt;
+  }
+
+  public FileManager lookupApplicationModel(String id)
+  {
+    return (FileManager) appRolesM.get(id);
   }
 
 }

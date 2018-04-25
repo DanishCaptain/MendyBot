@@ -3,9 +3,9 @@ package org.mendybot.common.role.system;
 import org.mendybot.common.application.log.Logger;
 import org.mendybot.common.application.model.ApplicationModel;
 import org.mendybot.common.exception.ExecuteException;
-import org.mendybot.common.role.MendyAppRole;
+import org.mendybot.common.role.MendyBotRole;
 
-public abstract class SystemRole implements MendyAppRole
+public abstract class SystemRole implements MendyBotRole
 {
   private static final Logger LOG = Logger.getInstance(SystemRole.class);
   private ApplicationModel model;

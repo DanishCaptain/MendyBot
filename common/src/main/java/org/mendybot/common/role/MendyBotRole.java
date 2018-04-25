@@ -2,7 +2,7 @@ package org.mendybot.common.role;
 
 import org.mendybot.common.exception.ExecuteException;
 
-public interface MendyAppRole
+public interface MendyBotRole
 {
 
   void init() throws ExecuteException;

@@ -1,20 +1,24 @@
-package org.mendybot.common.role.console;
+
+package org.mendybot.common.role.cm;
+
+import java.util.List;
 
 import org.mendybot.common.application.log.Logger;
 import org.mendybot.common.application.model.ApplicationModel;
 import org.mendybot.common.exception.ExecuteException;
-import org.mendybot.common.role.MendyBotRole;
+import org.mendybot.common.role.archive.Manifest;
 
-public abstract class ConsoleRole implements MendyBotRole
+public abstract class MasterManager
 {
-  private static final Logger LOG = Logger.getInstance(ConsoleRole.class);
+  private static final Logger LOG = Logger.getInstance(MasterManager.class);
   private ApplicationModel model;
 
-  public ConsoleRole(ApplicationModel model) {
+  public MasterManager(ApplicationModel model)
+  {
     this.model = model;
   }
   
-  public ApplicationModel getModel()
+  protected ApplicationModel getModel()
   {
     return model;
   }
@@ -24,10 +28,7 @@ public abstract class ConsoleRole implements MendyBotRole
   public abstract void start() throws ExecuteException;
 
   public abstract void stop();
-  
-  public String getAppName()
-  {
-    return model.getName();
-  }
+
+  public abstract List<Manifest> getSets() throws ExecuteException;
 
 }
