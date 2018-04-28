@@ -13,6 +13,7 @@ import java.util.Properties;
 
 import org.mendybot.common.application.Application;
 import org.mendybot.common.application.log.Logger;
+import org.mendybot.common.application.model.platform.ApplicationPlatform;
 import org.mendybot.common.application.model.widget.Widget;
 import org.mendybot.common.exception.ExecuteException;
 import org.mendybot.common.role.ApplicationRole;
@@ -35,6 +36,7 @@ public class ApplicationModel
   private Application application;
   private File dirEtc;
   private File dirOpt;
+  private ApplicationPlatform applicationPlatform;
 
   public ApplicationModel(Application application) throws ExecuteException
   {
@@ -46,9 +48,9 @@ public class ApplicationModel
     File logFile;
     if (testMode)
     {
-      logFile = new File("var/log/MB_"+application.getName()+"_");
+      logFile = new File("var/log/mendybot/MB_"+application.getName()+"_");
     } else {
-      logFile = new File("/var/log/MB_"+application.getName()+"_");
+      logFile = new File("/var/log/mendybot/MB_"+application.getName()+"_");
     }
     Logger.init(logFile.getAbsolutePath(), properties);
     LOG.logInfo("()", "test-mode: "+testMode);
@@ -56,6 +58,7 @@ public class ApplicationModel
     initConsoleRole(roles);
     initApplicationRoles(roles);
     initWidgets(widgetsM, widgetsL);
+    initPlatform();
   }
 
   private void loadConfig() throws ExecuteException
@@ -207,6 +210,28 @@ public class ApplicationModel
   public Widget lookupWidget(String name)
   {
     return widgetsM.get(name);
+  }
+
+  private void initPlatform() throws ExecuteException
+  {
+    String className = getConfigProperty("application-platform-class", "org.mendybot.common.application.model.platform.UbuntuPlatform");
+    try
+    {
+      @SuppressWarnings("unchecked")
+      Class<? extends ApplicationPlatform> c = (Class<? extends ApplicationPlatform>) Class.forName(className);
+      Constructor<? extends ApplicationPlatform> cc = c.getConstructor(new Class[]{ApplicationModel.class,});
+      applicationPlatform = cc.newInstance(new Object[]{this,});
+    }
+    catch (Exception e)
+    {
+      LOG.logSevere("initPlatform", "class: "+className);
+      throw new ExecuteException(e);
+    }
+  }
+  
+  public ApplicationPlatform getApplicationPlatform()
+  {
+    return applicationPlatform;
   }
 
   public void init() throws ExecuteException

@@ -2,6 +2,7 @@ package org.mendybot.common.role.cm;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.util.List;
@@ -53,6 +54,48 @@ public class RemoteMasterManager extends MasterManager
       OutputStream os = socket.getOutputStream();
       ObjectInputStream is = new ObjectInputStream(socket.getInputStream());
       os.write(LocalMasterManager.COMMAND_GET_SET_LIST);
+      os.flush();
+      list =  (List<Manifest>) is.readObject();
+      os.close();
+      is.close();
+      socket.close();
+    }
+    catch (Exception e)
+    {
+      throw new ExecuteException(e);
+    }
+    finally
+    {
+      if (socket != null) {
+        try
+        {
+          socket.close();
+        }
+        catch (IOException e)
+        {
+          // don't care a lot
+          LOG.logWarning("getSets", e);
+        }
+      }
+    }
+    return list;
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public List<Manifest> getSets(List<String> namesAllowed) throws ExecuteException
+  {
+    List<Manifest> list;
+    Socket socket = null;
+    try
+    {
+      socket = new Socket(host, LocalMasterManager.PORT);
+      ObjectOutputStream os = new ObjectOutputStream(socket.getOutputStream());
+      ObjectInputStream is = new ObjectInputStream(socket.getInputStream());
+      os.write(LocalMasterManager.COMMAND_GET_SET_LIST_ALLOWED_RESTRICTED);
+      os.flush();
+      os.writeObject(namesAllowed);
+      os.flush();
       list =  (List<Manifest>) is.readObject();
       os.close();
       is.close();

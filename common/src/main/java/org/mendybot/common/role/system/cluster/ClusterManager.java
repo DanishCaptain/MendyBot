@@ -106,11 +106,27 @@ public abstract class ClusterManager implements Runnable
           if (cluster.getAppName().equals(newPrime.getName())) {
             cluster.setRoleStatus(ClusterRoleStatus.PRIME);
             LOG.logInfo("run", "PRIME assumed");
+            try
+            {
+              getCluster().getModel().getApplicationPlatform().enableNetworkInterface("10.2.0.1", 24, "enp0s9");
+            }
+            catch (ExecuteException e1)
+            {
+              LOG.logSevere("run", e1);
+            }
           }
         }
         if (cluster.getRoleStatus() == ClusterRoleStatus.UNKNOWN) {
           cluster.setRoleStatus(ClusterRoleStatus.SLAVE);
           LOG.logInfo("run", "SLAVE assumed");
+          try
+          {
+            getCluster().getModel().getApplicationPlatform().disableNetworkInterface("10.2.0.1", 24, "enp0s9");
+          }
+          catch (ExecuteException e1)
+          {
+            LOG.logSevere("run", e1);
+          }
         }
         
 //        if (!hasPrime && previous != null) {

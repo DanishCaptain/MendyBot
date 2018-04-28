@@ -74,6 +74,7 @@ public class GraphicalConsole extends ConsoleRole implements WindowListener
     frame.dispose();
   }
 
+  @Override
   public void windowOpened(WindowEvent e)
   {
   }

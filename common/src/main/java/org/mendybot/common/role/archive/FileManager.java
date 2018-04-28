@@ -77,4 +77,29 @@ public class FileManager extends ApplicationRole
     return list;
   }
   
+  public List<Manifest> getSets(List<String> namesAllowed, String id)
+  {
+    ArrayList<Manifest> list = new ArrayList<>();
+    File f = contextM.get(id);
+    if (f != null && f.exists()) {
+      File[] dirs = f.listFiles();
+      for (File d : dirs) {
+        Manifest m = new Manifest(d.getName());
+        File[] entries = d.listFiles();
+        for (File e : entries) {
+          if (namesAllowed.contains(e.getName())) {
+            ManifestEntry me = new ManifestEntry(e.getName());
+            me.setLastModified(e.lastModified());
+            m.add(me);
+          }
+        }
+        if (m.getEntries().size() > 0) 
+        {
+          list.add(m);
+        }
+      }
+    }
+    return list;
+  }
+  
 }

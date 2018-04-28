@@ -2,7 +2,7 @@ package org.mendybot.common.role.cm;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
+import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -20,6 +20,7 @@ public class LocalMasterManager extends MasterManager implements Runnable
   public static final int PORT = 3000;
   public static final String ID = "CMMM";
   public static final byte COMMAND_GET_SET_LIST = 10;
+  public static final byte COMMAND_GET_SET_LIST_ALLOWED_RESTRICTED = 11;
   private Thread t = new Thread(this);
   private File workDir;
   // private File masterDir;
@@ -79,6 +80,14 @@ public class LocalMasterManager extends MasterManager implements Runnable
   }
 
   @Override
+  public List<Manifest> getSets(List<String> namesAllowed) throws ExecuteException
+  {
+    List<Manifest> vSet = fileManager.getSets(namesAllowed, ID);
+    LOG.logInfo("getSets", "versions: " + vSet);
+    return vSet;
+  }
+
+  @Override
   public void run()
   {
     running = true;
@@ -87,17 +96,24 @@ public class LocalMasterManager extends MasterManager implements Runnable
       {
         Socket socket = ss.accept();
         ObjectOutputStream os = new ObjectOutputStream(socket.getOutputStream());
-        InputStream is = socket.getInputStream();
+        ObjectInputStream is = new ObjectInputStream(socket.getInputStream());
         byte command = (byte) is.read();
         if (command == COMMAND_GET_SET_LIST)
         {
           os.writeObject(getSets());
+          os.flush();
+        } else if (command == COMMAND_GET_SET_LIST_ALLOWED_RESTRICTED)
+        {
+          @SuppressWarnings("unchecked")
+          List<String> namesAllowed = (List<String>) is.readObject();
+          os.writeObject(getSets(namesAllowed));
+          os.flush();
         }
         os.close();
         is.close();
         socket.close();
       }
-      catch (IOException e)
+      catch (Exception e)
       {
         LOG.logSevere("run", e);
       }

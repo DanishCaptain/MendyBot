@@ -1,6 +1,7 @@
 package org.mendybot.common.role.cm;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.mendybot.common.application.log.Logger;
@@ -19,6 +20,7 @@ public class ConfigurationManager extends ApplicationRole implements Runnable
   private MasterManager master;
   private FileManager fileManager;
   private boolean running;
+  private List<String> namesAllowed;
 
   public ConfigurationManager(ApplicationModel model) {
     super(model, ID);
@@ -47,6 +49,7 @@ public class ConfigurationManager extends ApplicationRole implements Runnable
     {
       fileManager.initContext(ConfigurationManager.ID);
     }
+    namesAllowed = getModel().getProperties(ID+".jars-allowed");
  }
 
   @Override
@@ -73,7 +76,10 @@ public class ConfigurationManager extends ApplicationRole implements Runnable
       LOG.logInfo("run", "versions: " + vSet);
       try
       {
-        List<Manifest> masterSet = master.getSets();
+        System.out.println("allowed: "+namesAllowed);
+        List<Manifest> masterSet = master.getSets(namesAllowed);
+        
+        
         LOG.logInfo("run", "master versions: " + masterSet);
         boolean areSetsConsistent = vSet.toString().equals(masterSet.toString());
         LOG.logInfo("run", "consistent: " + areSetsConsistent);
