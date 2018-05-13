@@ -1,0 +1,42 @@
+#! /bin/sh
+PATH=/bin:/usr/bin:/sbin:/usr/sbin:/opt/MendyBot/station
+DAEMON=/opt/MendyBot/station/run.sh
+PIDFILE=/var/run/mendystation.pid
+
+test -x $DAEMON || exit 0
+
+case "$1" in
+  start)
+      su - mendybot -s /bin/sh -c "/opt/MendyBot/station/run.sh > /dev/null 2>&1 &"
+      echo "mendystation is now up" 
+    ;;
+  stop)
+    PID=`ps -aux |grep mendybot |grep station.jar |tr -s " " | cut -d " " -f 2`
+    if [ -z "$PID" ]
+    then
+      echo "mendystation is already down" 
+    else
+      kill -15 $PID
+      echo "mendystation is now down" 
+    fi
+    ;;
+  force-reload|restart)
+    $0 stop
+    $0 start
+    ;;
+  status)
+    PID=`ps -aux |grep mendybot |grep station.jar |tr -s " " | cut -d " " -f 2`
+    if [ -z "$PID" ]
+    then
+      echo "mendystation is down" 
+    else
+      echo "mendystation is up" 
+    fi
+    ;;
+  *)
+    echo "Usage: /etc/init.d/mendystation {start|stop|restart|force-reload|status}"
+    exit 1
+    ;;
+esac
+
+exit 0
