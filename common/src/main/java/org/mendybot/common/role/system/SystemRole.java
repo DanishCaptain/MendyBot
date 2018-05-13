@@ -11,6 +11,7 @@ public abstract class SystemRole implements MendyBotRole
   private ApplicationModel model;
 
   public SystemRole(ApplicationModel model) {
+    LOG.logDebug("()", "call");
     this.model = model;
   }
   

@@ -6,8 +6,12 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.List;
 
+import org.mendybot.common.application.log.Logger;
+import org.mendybot.common.role.cm.MasterManager;
+
 public class Watcher implements Runnable
 {
+  private static final Logger LOG = Logger.getInstance(Watcher.class);
   private Thread t = new Thread(this);
   private List<String> list;
   private BufferedReader br;
@@ -32,8 +36,7 @@ public class Watcher implements Runnable
     }
     catch (IOException e)
     {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
+      LOG.logDebug("run", e);
     }
   }
 

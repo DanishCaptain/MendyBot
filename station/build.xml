@@ -30,6 +30,7 @@
 	</target>
 
 	<target name="jar" depends="compile">
+		<delete file="${jar.file}" />
 		<mkdir dir="${lib.dir}" />
 		<copy todir="${build.dir}" flatten="true">
 		    <fileset dir="${src.resources}">

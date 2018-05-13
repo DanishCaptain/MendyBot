@@ -18,7 +18,6 @@ import org.mendybot.common.application.model.widget.Widget;
 import org.mendybot.common.exception.ExecuteException;
 import org.mendybot.common.role.ApplicationRole;
 import org.mendybot.common.role.MendyBotRole;
-import org.mendybot.common.role.archive.FileManager;
 import org.mendybot.common.role.console.ConsoleRole;
 import org.mendybot.common.role.console.headless.HeadlessConsole;
 import org.mendybot.common.role.system.SingleServer;
@@ -344,9 +343,13 @@ public class ApplicationModel
     return dirOpt;
   }
 
-  public FileManager lookupApplicationModel(String id)
+  public ApplicationRole lookupApplicationModel(String id)
   {
-    return (FileManager) appRolesM.get(id);
+    return appRolesM.get(id);
   }
 
+  public List<Widget> getWidgets()
+  {
+    return this.widgetsL;
+  }
 }

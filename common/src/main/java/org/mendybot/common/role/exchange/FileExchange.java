@@ -1,11 +1,13 @@
 package org.mendybot.common.role.exchange;
 
 import java.io.File;
+import java.util.List;
 
 import org.mendybot.common.application.log.Logger;
 import org.mendybot.common.application.model.ApplicationModel;
 import org.mendybot.common.exception.ExecuteException;
 import org.mendybot.common.role.ApplicationRole;
+import org.mendybot.common.role.archive.Manifest;
 
 public class FileExchange extends ApplicationRole
 {
@@ -38,5 +40,5 @@ public class FileExchange extends ApplicationRole
   {
     LOG.logInfo("stop", "called");
   }
-  
+
 }

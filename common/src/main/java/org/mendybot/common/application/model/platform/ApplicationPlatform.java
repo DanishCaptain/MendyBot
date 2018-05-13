@@ -17,9 +17,9 @@ public abstract class ApplicationPlatform
     return model;
   }
 
-  public abstract void enableNetworkInterface(String ipAddress, int netmaskBits, String device) throws ExecuteException;
+  public abstract void enableNetworkInterface(String ipAddress, int netmaskBits) throws ExecuteException;
 
-  public abstract void disableNetworkInterface(String ipAddress, int netmaskBits, String device) throws ExecuteException;
+  public abstract void disableNetworkInterface(String ipAddress, int netmaskBits) throws ExecuteException;
 
   public abstract void checkNetworkInterface(String device) throws ExecuteException;
 

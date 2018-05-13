@@ -1,6 +1,7 @@
 package org.mendybot.common.role.console.heavyweight;
 
 import java.awt.Dimension;
+import java.awt.Graphics;
 import java.awt.Toolkit;
 import java.awt.image.BufferedImage;
 
@@ -22,4 +23,9 @@ public class OnscreenImagePanel extends JPanel
     return image;
   }
 
+  @Override
+  public void paint(Graphics g) {
+    //super.paint(g);
+    g.drawImage(image, 0, 0, this);
+  }
 }

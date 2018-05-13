@@ -19,6 +19,7 @@ public class MultiNodeCluster extends ClusterRole
   @Override
   protected ClusterManager createClusterManager()
   {
+    LOG.logDebug("createClusterManager", "call");
     return new MulticastManager(this);
   }
 

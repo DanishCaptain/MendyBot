@@ -1,8 +1,9 @@
 package org.mendybot.common.role.cm;
 
-import java.io.File;
-import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import org.mendybot.common.application.log.Logger;
 import org.mendybot.common.application.model.ApplicationModel;
@@ -10,6 +11,7 @@ import org.mendybot.common.exception.ExecuteException;
 import org.mendybot.common.role.ApplicationRole;
 import org.mendybot.common.role.archive.FileManager;
 import org.mendybot.common.role.archive.Manifest;
+import org.mendybot.common.role.archive.ManifestEntry;
 
 public class ConfigurationManager extends ApplicationRole implements Runnable
 {
@@ -30,7 +32,7 @@ public class ConfigurationManager extends ApplicationRole implements Runnable
     } else {
       master = new RemoteMasterManager(model);
     }
-    File myDir = new File(model.getWorkingOptDir(), model.getName());
+//    File myDir = new File(model.getWorkingOptDir(), model.getName());
 //    workDir = new File(myDir, "release");
 //    if (!workDir.exists()) {
 //      workDir.mkdirs();
@@ -44,7 +46,7 @@ public class ConfigurationManager extends ApplicationRole implements Runnable
     t.setName(getClass().getSimpleName());
     t.setDaemon(true);
     master.init();
-    fileManager = getModel().lookupApplicationModel(FileManager.ID);
+    fileManager = (FileManager) getModel().lookupApplicationModel(FileManager.ID);
     if (fileManager != null)
     {
       fileManager.initContext(ConfigurationManager.ID);
@@ -72,20 +74,25 @@ public class ConfigurationManager extends ApplicationRole implements Runnable
   {
     running = true;
     while(running) {
-      List<Manifest> vSet = fileManager.getSets(ConfigurationManager.ID);
+      Map<String, Manifest> vSet = fileManager.getSets(ConfigurationManager.ID);
       LOG.logInfo("run", "versions: " + vSet);
       try
       {
         System.out.println("allowed: "+namesAllowed);
-        List<Manifest> masterSet = master.getSets(namesAllowed);
+        Map<String, Manifest> masterSet = master.getSets(namesAllowed);
         
         
-        LOG.logInfo("run", "master versions: " + masterSet);
         boolean areSetsConsistent = vSet.toString().equals(masterSet.toString());
-        LOG.logInfo("run", "consistent: " + areSetsConsistent);
         if (!areSetsConsistent)
         {
-          //x
+          LOG.logInfo("run", "master versions: " + masterSet);
+          LOG.logInfo("run", "consistent: " + areSetsConsistent);
+          Map<String, Manifest> deltaNew = filterMissing(masterSet, vSet);
+          LOG.logInfo("run", "need to grab: "+ConfigurationManager.ID+"<-"+deltaNew);
+          master.requestAdd(ConfigurationManager.ID, fileManager, deltaNew);
+          Map<String, Manifest> deltaOld = filterExtra(masterSet, vSet);
+          LOG.logInfo("run", "need to remove: "+ConfigurationManager.ID+"<-"+deltaOld);
+          master.requestRemove(ConfigurationManager.ID, fileManager, deltaOld);
         }
       }
       catch (ExecuteException e)
@@ -94,14 +101,88 @@ public class ConfigurationManager extends ApplicationRole implements Runnable
       }
       try
       {
-        Thread.sleep(5 * 60 * 1000);
-//        Thread.sleep(60 * 1000);
+//        Thread.sleep(5 * 60 * 1000);
+        Thread.sleep(60 * 1000);
       }
       catch (InterruptedException e)
       {
         running = false;
       }
     }
+  }
+
+  public static Map<String, Manifest> filterMissing(Map<String, Manifest> master, Map<String, Manifest> local)
+  {
+    Map<String, Manifest> map = new LinkedHashMap<>();
+    if (master.size() == 0) {
+      return map;
+    }
+    if (local.size() == 0) {
+      map.putAll(master);
+      return map;
+    }
+
+    for (Entry<String, Manifest> mSet : master.entrySet()) {
+      Manifest mMaster = mSet.getValue();
+      Manifest mLocal = local.get(mMaster.getName());
+      if (mLocal == null) {
+        map.put(mMaster.getName(), mMaster);
+      } else {
+        Manifest mNew = new Manifest(mMaster.getName());
+        for (Entry<String, ManifestEntry> meSet : mMaster.getEntries().entrySet()) {
+          ManifestEntry meMaster = meSet.getValue();
+          ManifestEntry meLocal = mLocal.getEntries().get(meMaster.getName());
+          if (meLocal == null) {
+            mNew.add(meMaster);
+          } else {
+            if (meMaster.getLastModified() != meLocal.getLastModified()) {
+              mNew.add(meMaster);
+            }
+          }
+        }
+        if (mNew.getEntries().size() > 0) {
+          map.put(mNew.getName(), mNew);
+        }
+      }
+    }
+    return map;
+  }
+  
+  public static Map<String, Manifest> filterExtra(Map<String, Manifest> master, Map<String, Manifest> local)
+  {
+    Map<String, Manifest> map = new LinkedHashMap<>();
+    if (local.size() == 0) {
+      return map;
+    }
+    if (master.size() == 0) {
+      map.putAll(local);
+      return map;
+    }
+
+    for (Entry<String, Manifest> mSet : local.entrySet()) {
+      Manifest mMaster = mSet.getValue();
+      Manifest mLocal = master.get(mMaster.getName());
+      if (mLocal == null) {
+        map.put(mMaster.getName(), mMaster);
+      } else {
+        Manifest mNew = new Manifest(mMaster.getName());
+        for (Entry<String, ManifestEntry> meSet : mMaster.getEntries().entrySet()) {
+          ManifestEntry meMaster = meSet.getValue();
+          ManifestEntry meLocal = mLocal.getEntries().get(meMaster.getName());
+          if (meLocal == null) {
+            mNew.add(meMaster);
+          } else {
+            if (meMaster.getLastModified() != meLocal.getLastModified()) {
+              mNew.add(meMaster);
+            }
+          }
+        }
+        if (mNew.getEntries().size() > 0) {
+          map.put(mNew.getName(), mNew);
+        }
+      }
+    }
+    return map;
   }
   
 }

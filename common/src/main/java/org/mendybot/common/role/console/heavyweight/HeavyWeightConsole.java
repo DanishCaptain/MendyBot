@@ -17,13 +17,14 @@ public class HeavyWeightConsole extends ConsoleRole implements WindowListener
 {
   private static final Logger LOG = Logger.getInstance(HeavyWeightConsole.class);
   private JFrame frame;
+  private OnscreenImagePanel main;
   private BufferedImage image;
 
   public HeavyWeightConsole(ApplicationModel model)
   {
     super(model);
     frame = new JFrame(model.getName());
-    OnscreenImagePanel main = new OnscreenImagePanel();
+    main = new OnscreenImagePanel();
     frame.setContentPane(main);
     
     Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
@@ -36,8 +37,9 @@ public class HeavyWeightConsole extends ConsoleRole implements WindowListener
 
 
   @Override
-  public void init() throws ExecuteException
+  protected void initConsole() throws ExecuteException
   {
+    LOG.logDebug("initConsole", "call");
 	    frame.addWindowListener(this);
   }
 
@@ -45,6 +47,7 @@ public class HeavyWeightConsole extends ConsoleRole implements WindowListener
   public void start() throws ExecuteException
   {
 	    frame.setVisible(true);
+	    repaint();
   }
 
   @Override
@@ -89,6 +92,20 @@ public class HeavyWeightConsole extends ConsoleRole implements WindowListener
   @Override
   public void windowDeactivated(WindowEvent e)
   {
+  }
+
+
+  @Override
+  protected void repaintLocal()
+  {
+    main.repaint();
+  }
+
+
+  @Override
+  protected BufferedImage getImage()
+  {
+    return image;
   }
 
 }

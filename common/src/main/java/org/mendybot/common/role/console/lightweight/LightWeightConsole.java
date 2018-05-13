@@ -1,15 +1,16 @@
 package org.mendybot.common.role.console.lightweight;
 
+import java.awt.image.BufferedImage;
+
 import org.mendybot.common.application.log.Logger;
 import org.mendybot.common.application.model.ApplicationModel;
 import org.mendybot.common.exception.ExecuteException;
 import org.mendybot.common.role.console.ConsoleRole;
 
-public class LightWeightConsole extends ConsoleRole implements Runnable
+public class LightWeightConsole extends ConsoleRole
 {
   private static final Logger LOG = Logger.getInstance(LightWeightConsole.class);
-  private Thread t = new Thread(this);
-  private boolean running;
+  private FrameBuffer fb;
 
   public LightWeightConsole(ApplicationModel model)
   {
@@ -18,39 +19,35 @@ public class LightWeightConsole extends ConsoleRole implements Runnable
 
 
   @Override
-  public void init() throws ExecuteException
+  protected void initConsole() throws ExecuteException
   {
-    t.setName(getClass().getSimpleName());
+    LOG.logDebug("initConsole", "call");
+    fb = new FrameBuffer("/dev/fb0");
   }
 
   @Override
   public void start() throws ExecuteException
   {
-    t.start();
   }
 
   @Override
   public void stop()
   {
-    running = false;
-    t.interrupt();
   }
 
 
   @Override
-  public void run()
+  protected void repaintLocal()
   {
-    running = true;
-    while(running) {
-      try
-      {
-        Thread.sleep(10000);
-      }
-      catch (InterruptedException e)
-      {
-        running = false;
-      }
-    }
+//    fb.repaint();
   }
+
+
+  @Override
+  protected BufferedImage getImage()
+  {
+    return fb.getImage();
+  }
+
 
 }

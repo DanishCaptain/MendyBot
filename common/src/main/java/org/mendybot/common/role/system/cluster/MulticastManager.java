@@ -17,6 +17,7 @@ public class MulticastManager extends ClusterManager
   @Override
   protected void initManager() throws ExecuteException
   {
+    LOG.logDebug("initManager", "call");
     try
     {
       receiver = new MulticastReceiver(this);

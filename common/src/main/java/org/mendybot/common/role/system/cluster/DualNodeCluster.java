@@ -18,6 +18,7 @@ public class DualNodeCluster extends ClusterRole
   @Override
   protected ClusterManager createClusterManager()
   {
+    LOG.logDebug("createClusterManager", "call");
     return new SerialManager(this);
   }
 

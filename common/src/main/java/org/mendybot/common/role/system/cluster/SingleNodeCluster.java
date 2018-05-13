@@ -16,6 +16,7 @@ public class SingleNodeCluster extends ClusterRole
   @Override
   protected ClusterManager createClusterManager()
   {
+    LOG.logDebug("createClusterManager", "call");
     return new MemoryManager(this);
   }
 

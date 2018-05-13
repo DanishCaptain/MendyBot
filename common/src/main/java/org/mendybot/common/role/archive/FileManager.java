@@ -1,12 +1,14 @@
 package org.mendybot.common.role.archive;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.mendybot.common.application.log.Logger;
 import org.mendybot.common.application.model.ApplicationModel;
+import org.mendybot.common.application.model.platform.CommandTool;
 import org.mendybot.common.exception.ExecuteException;
 import org.mendybot.common.role.ApplicationRole;
 
@@ -57,9 +59,9 @@ public class FileManager extends ApplicationRole
     contextM.put(id, c);
   }
 
-  public List<Manifest> getSets(String id)
+  public Map<String, Manifest> getSets(String id)
   {
-    ArrayList<Manifest> list = new ArrayList<>();
+    Map<String, Manifest> map = new LinkedHashMap<>();
     File f = contextM.get(id);
     if (f != null && f.exists()) {
       File[] dirs = f.listFiles();
@@ -71,15 +73,15 @@ public class FileManager extends ApplicationRole
           me.setLastModified(e.lastModified());
           m.add(me);
         }
-        list.add(m);
+        map.put(m.getName(), m);
       }
     }
-    return list;
+    return map;
   }
   
-  public List<Manifest> getSets(List<String> namesAllowed, String id)
+  public Map<String, Manifest> getSets(List<String> namesAllowed, String id)
   {
-    ArrayList<Manifest> list = new ArrayList<>();
+    Map<String, Manifest> map = new LinkedHashMap<>();
     File f = contextM.get(id);
     if (f != null && f.exists()) {
       File[] dirs = f.listFiles();
@@ -95,11 +97,60 @@ public class FileManager extends ApplicationRole
         }
         if (m.getEntries().size() > 0) 
         {
-          list.add(m);
+          map.put(m.getName(), m);
         }
       }
     }
-    return list;
+    return map;
+  }
+
+  public File lookupFile(String id, String manifestName, String manefestEntryName)
+  {
+    LOG.logDebug("lookupFile", "call");
+    File baseDir = contextM.get(id);
+    File mDir = new File(baseDir, manifestName);
+    File mEntry = new File(mDir, manefestEntryName);
+    return mEntry;
+  }
+
+  public void copyTo(String id, String manifestName, String manefestEntryName, long lastModified, File f) throws ExecuteException
+  {
+    File baseDir = contextM.get(id);
+    File mDir = new File(baseDir, manifestName);
+    if (!mDir.exists()) {
+      mDir.mkdirs();
+    }
+    File mEntry = new File(mDir, manefestEntryName);
+    
+    LOG.logInfo("copyTo", mEntry.getAbsolutePath() +":"+mEntry.exists());
+    
+    File temp = new File(mDir, "temp_"+manefestEntryName);
+    CommandTool ct = new CommandTool("cp "+f.getAbsolutePath()+" "+temp.getAbsolutePath());
+    int result = ct.call();
+    temp.renameTo(mEntry);
+    mEntry.setLastModified(lastModified);
+    LOG.logInfo("copyTo", result+"::"+mEntry.exists());
+    
+  }
+  
+  public void remove(String id, String manifestName, String manefestEntryName) throws ExecuteException
+  {
+    File baseDir = contextM.get(id);
+    File mDir = new File(baseDir, manifestName);
+    if (!mDir.exists()) {
+      mDir.mkdirs();
+    }
+    File mEntry = new File(mDir, manefestEntryName);
+    
+    LOG.logInfo("remove", mEntry.getAbsolutePath() +":"+mEntry.exists());
+    
+    CommandTool ct = new CommandTool("rm "+mEntry.getAbsolutePath());
+    int result = ct.call();
+    if (mDir.listFiles().length == 0) {
+      mDir.delete();
+    }
+    LOG.logInfo("fileRemoved", result+"::"+mEntry.exists());
+    
   }
   
 }

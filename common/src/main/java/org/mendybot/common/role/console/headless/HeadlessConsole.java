@@ -1,5 +1,7 @@
 package org.mendybot.common.role.console.headless;
 
+import java.awt.image.BufferedImage;
+
 import org.mendybot.common.application.log.Logger;
 import org.mendybot.common.application.model.ApplicationModel;
 import org.mendybot.common.exception.ExecuteException;
@@ -16,10 +18,9 @@ public class HeadlessConsole extends ConsoleRole
 
 
   @Override
-  public void init() throws ExecuteException
+  protected void initConsole() throws ExecuteException
   {
-    // TODO Auto-generated method stub
-    
+    LOG.logDebug("initConsole", "call");
   }
 
   @Override
@@ -34,6 +35,22 @@ public class HeadlessConsole extends ConsoleRole
   {
     // TODO Auto-generated method stub
     
+  }
+
+
+  @Override
+  protected void repaintLocal()
+  {
+    // TODO Auto-generated method stub
+    
+  }
+
+
+  @Override
+  protected BufferedImage getImage()
+  {
+    // TODO Auto-generated method stub
+    return null;
   }
 
 }

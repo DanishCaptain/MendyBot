@@ -21,6 +21,7 @@ public abstract class ClusterRole extends SystemRole
   @Override
   public final void init() throws ExecuteException
   {
+    LOG.logDebug("init", "call");
     clusterManager.init();
   }
 

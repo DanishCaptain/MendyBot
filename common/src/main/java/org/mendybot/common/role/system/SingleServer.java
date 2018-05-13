@@ -16,6 +16,7 @@ public class SingleServer extends SystemRole
   @Override
   public void init() throws ExecuteException
   {
+    LOG.logDebug("init", "call");
   }
 
   @Override

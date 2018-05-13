@@ -108,7 +108,7 @@ public abstract class ClusterManager implements Runnable
             LOG.logInfo("run", "PRIME assumed");
             try
             {
-              getCluster().getModel().getApplicationPlatform().enableNetworkInterface("10.2.0.1", 24, "enp0s9");
+              getCluster().getModel().getApplicationPlatform().enableNetworkInterface("10.2.0.1", 24);
             }
             catch (ExecuteException e1)
             {
@@ -121,7 +121,7 @@ public abstract class ClusterManager implements Runnable
           LOG.logInfo("run", "SLAVE assumed");
           try
           {
-            getCluster().getModel().getApplicationPlatform().disableNetworkInterface("10.2.0.1", 24, "enp0s9");
+            getCluster().getModel().getApplicationPlatform().disableNetworkInterface("10.2.0.1", 24);
           }
           catch (ExecuteException e1)
           {

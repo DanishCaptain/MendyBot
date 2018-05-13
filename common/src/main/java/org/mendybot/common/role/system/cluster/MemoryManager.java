@@ -14,8 +14,7 @@ public class MemoryManager extends ClusterManager
   @Override
   protected void initManager()
   {
-    // TODO Auto-generated method stub
-    
+    LOG.logDebug("initManager", "call");
   }
 
   @Override

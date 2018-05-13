@@ -1,13 +1,14 @@
 package org.mendybot.common.role.archive;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Map.Entry;
 
-public class Manifest implements Serializable
+public class Manifest implements Cloneable, Serializable
 {
   private static final long serialVersionUID = 2385571198616776882L;
-  private ArrayList<ManifestEntry> entries = new ArrayList<>();
+  private LinkedHashMap<String, ManifestEntry> entries = new LinkedHashMap<>();
   private String name;
 
   public Manifest(String name)
@@ -24,23 +25,41 @@ public class Manifest implements Serializable
   {
     synchronized(entries)
     {
-      entries.add(me);
+      entries.put(me.getName(), me);
     }
   }
 
-  public List<ManifestEntry> getEntries()
+  public void remove(ManifestEntry me)
   {
-    ArrayList<ManifestEntry> list = new ArrayList<>();
     synchronized(entries)
     {
-      list.addAll(entries);
+      entries.remove(me.getName());
     }
-    return list;
+  }
+  
+  public Map<String, ManifestEntry> getEntries()
+  {
+    LinkedHashMap<String, ManifestEntry> map = new LinkedHashMap<>();
+    synchronized(entries)
+    {
+      map.putAll(entries);
+    }
+    return map;
   }
   
   @Override
   public String toString()
   {
     return name+" "+entries;
+  }
+
+  public Manifest clone()
+  {
+    Manifest m = new Manifest(name);
+    for (Entry<String, ManifestEntry> meSet : entries.entrySet())
+    {
+      m.add(meSet.getValue().clone());
+    }
+    return m;    
   }
 }

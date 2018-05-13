@@ -6,6 +6,7 @@ import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.awt.image.BufferedImage;
 import java.util.TimeZone;
 
 import javax.swing.JFrame;
@@ -42,7 +43,7 @@ public class GraphicalConsole extends ConsoleRole implements WindowListener
   }
 
   @Override
-  public void init() throws ExecuteException
+  protected void initConsole() throws ExecuteException
   {
     frame.addWindowListener(this);
     TimekeeperWidget widget = (TimekeeperWidget) getModel().lookupWidget("TIMEKEEPER");
@@ -103,6 +104,18 @@ public class GraphicalConsole extends ConsoleRole implements WindowListener
 
   public void windowDeactivated(WindowEvent e)
   {
+  }
+
+  @Override
+  protected void repaintLocal()
+  {
+  }
+
+  @Override
+  protected BufferedImage getImage()
+  {
+    // TODO Auto-generated method stub
+    return null;
   }
 
 }

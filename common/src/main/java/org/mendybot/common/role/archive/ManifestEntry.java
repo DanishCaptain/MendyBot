@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class ManifestEntry implements Serializable
+public class ManifestEntry implements Cloneable, Serializable
 {
   private static final long serialVersionUID = 5802927347869727709L;
   private String name;
@@ -30,6 +30,13 @@ public class ManifestEntry implements Serializable
     return lastModified;
   }
 
+  public ManifestEntry clone()
+  {
+    ManifestEntry me = new ManifestEntry(name);
+    me.setLastModified(lastModified);
+    return me;    
+  }
+  
   @Override
   public String toString()
   {
