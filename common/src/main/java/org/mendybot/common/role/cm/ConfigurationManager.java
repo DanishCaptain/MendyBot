@@ -26,11 +26,14 @@ public class ConfigurationManager extends ApplicationRole implements Runnable
 
   public ConfigurationManager(ApplicationModel model) {
     super(model, ID);
-    boolean isMaster = Boolean.parseBoolean(model.getProperty(ID+".IsMaster", "false"));
-    if (isMaster) {
-      master = new LocalMasterManager(model);
-    } else {
-      master = new RemoteMasterManager(model);
+    boolean isCMDisable = Boolean.parseBoolean(model.getProperty(ID+".Disable", "false"));
+    if (!isCMDisable) {
+      boolean isMaster = Boolean.parseBoolean(model.getProperty(ID+".IsMaster", "false"));
+      if (isMaster) {
+        master = new LocalMasterManager(model);
+      } else {
+        master = new RemoteMasterManager(model);
+      }
     }
 //    File myDir = new File(model.getWorkingOptDir(), model.getName());
 //    workDir = new File(myDir, "release");
@@ -45,7 +48,10 @@ public class ConfigurationManager extends ApplicationRole implements Runnable
     LOG.logInfo("init", "called");
     t.setName(getClass().getSimpleName());
     t.setDaemon(true);
-    master.init();
+    if (master != null) 
+    {
+      master.init();
+    }
     fileManager = (FileManager) getModel().lookupApplicationModel(FileManager.ID);
     if (fileManager != null)
     {
@@ -58,7 +64,10 @@ public class ConfigurationManager extends ApplicationRole implements Runnable
   public void start() throws ExecuteException
   {
     LOG.logInfo("start", "called");
-    master.start();
+    if (master != null) 
+    {
+      master.start();
+    }
     t.start();
   }
 
@@ -66,13 +75,16 @@ public class ConfigurationManager extends ApplicationRole implements Runnable
   public void stop()
   {
     LOG.logInfo("stop", "called");
-    master.stop();
+    if (master != null) 
+    {
+      master.stop();
+    }
   }
 
   @Override
   public void run()
   {
-    running = true;
+    running = master != null;
     while(running) {
       Map<String, Manifest> vSet = fileManager.getSets(ConfigurationManager.ID);
       LOG.logInfo("run", "versions: " + vSet);

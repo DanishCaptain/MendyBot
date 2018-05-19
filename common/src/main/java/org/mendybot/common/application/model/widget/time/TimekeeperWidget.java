@@ -1,11 +1,13 @@
 package org.mendybot.common.application.model.widget.time;
 
+import org.mendybot.common.application.log.Logger;
 import org.mendybot.common.application.model.ApplicationModel;
 import org.mendybot.common.application.model.widget.Widget;
 import org.mendybot.common.exception.ExecuteException;
 
 public class TimekeeperWidget extends Widget
 {
+  private static final Logger LOG = Logger.getInstance(TimekeeperWidget.class);
 	private Ticker ticker = new Ticker();
 
 	  
@@ -17,17 +19,20 @@ public class TimekeeperWidget extends Widget
   @Override
   public void init() throws ExecuteException
   {
+    LOG.logInfo("init", "call");
   }
 
   @Override
   public void start() throws ExecuteException
   {
+    LOG.logInfo("start", "call");
 	  ticker.start();
   }
 
   @Override
   public void stop()
   {
+    LOG.logInfo("stop", "call");
     ticker.stop();
   }
 

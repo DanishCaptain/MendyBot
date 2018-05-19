@@ -1,7 +1,5 @@
 package org.mendybot.console.view.glyph;
 
-import java.awt.Dimension;
-
 import javax.swing.JPanel;
 import javax.swing.event.AncestorEvent;
 import javax.swing.event.AncestorListener;
@@ -10,11 +8,17 @@ public abstract class Glyph extends JPanel implements AncestorListener
 {
   private static final long serialVersionUID = 8531725161069088115L;
   private PanelPosition pos;
+  private int ratioWidth;
+  private int ratioHeight;
+  private int percent;
 
-  public Glyph(PanelPosition pos, Dimension d)
+  public Glyph(PanelPosition pos, int ratioWidth, int ratioHeight, int percent)
   {
     this.pos=pos;
-    setSize(d);
+    this.ratioWidth = ratioWidth;
+    this.ratioHeight = ratioHeight;
+    this.percent = percent;
+    setSize(100,100);
     addAncestorListener(this);
   }
 
@@ -28,9 +32,16 @@ public abstract class Glyph extends JPanel implements AncestorListener
   {
     int w = getParent().getWidth();
     int h = getParent().getHeight();
+    
+    
+    int myW = Math.round(w);
+    int myH = Math.round(h);
+    System.out.println(myW+":"+myH);
+    setSize(myW, myH);
+    
 //    System.out.println(w+":"+h);
     if (pos == PanelPosition.TOP_LEFT) {
-      setLocation(10, 10);
+      setLocation(0, 0);
     } else if (pos == PanelPosition.TOP_CENTER) {
       setLocation((w/2)-(getWidth()/2), 10);
     } else if (pos == PanelPosition.TOP_RIGHT) {

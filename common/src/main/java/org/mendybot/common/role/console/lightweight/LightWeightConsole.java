@@ -22,12 +22,15 @@ public class LightWeightConsole extends ConsoleRole
   protected void initConsole() throws ExecuteException
   {
     LOG.logDebug("initConsole", "call");
-    fb = new FrameBuffer("/dev/fb0");
+    String fbPath = getModel().getProperty("LightWeightConsole.FrameBuffer", "/dev/fb0");
+    fb = new FrameBuffer(fbPath);
   }
 
   @Override
   public void start() throws ExecuteException
   {
+    int width = fb.getWidth();
+    int height = fb.getHeight();
   }
 
   @Override

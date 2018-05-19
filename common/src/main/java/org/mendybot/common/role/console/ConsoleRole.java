@@ -1,5 +1,6 @@
 package org.mendybot.common.role.console;
 
+import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.lang.reflect.Constructor;
@@ -32,6 +33,7 @@ public abstract class ConsoleRole implements MendyBotRole
 
   public final void init() throws ExecuteException
   {
+    LOG.logInfo("init", "call");
     initGlyphs(glyphsM, glyphsL);
     initConsole();
   }
@@ -85,8 +87,8 @@ public abstract class ConsoleRole implements MendyBotRole
     BufferedImage image = getImage();
     synchronized(image) {
       Graphics g = image.getGraphics();
-//    g.setColor(Color.BLACK);
-//    g.fillRect(0, 0, image.getWidth(), image.getHeight());
+    g.setColor(Color.BLACK);
+    g.fillRect(0, 0, image.getWidth(), image.getHeight());
     
     for (Glyph gg : glyphsL)
     {
@@ -99,5 +101,15 @@ public abstract class ConsoleRole implements MendyBotRole
   protected abstract void repaintLocal();
 
   protected abstract BufferedImage getImage();
+
+  public int getW()
+  {
+    return getImage().getWidth();
+  }
+  
+  public int getH()
+  {
+    return getImage().getHeight();
+  }
   
 }
