@@ -45,7 +45,7 @@ public class LocalMasterManager extends MasterManager implements Runnable
 
   public void init() throws ExecuteException
   {
-    LOG.logInfo("init", "called");
+    LOG.logDebug("init", "called");
     fileManager = (FileManager) getModel().lookupApplicationModel(FileManager.ID);
     if (fileManager != null)
     {
@@ -65,13 +65,13 @@ public class LocalMasterManager extends MasterManager implements Runnable
 
   public void start() throws ExecuteException
   {
-    LOG.logInfo("start", "called");
+    LOG.logDebug("start", "called");
     t.start();
   }
 
   public void stop()
   {
-    LOG.logInfo("stop", "called");
+    LOG.logDebug("stop", "called");
     running = false;
     t.interrupt();
   }
@@ -80,7 +80,7 @@ public class LocalMasterManager extends MasterManager implements Runnable
   public Map<String, Manifest> getSets()
   {
     Map<String, Manifest> vSet = fileManager.getSets(ID);
-    LOG.logInfo("getSets-"+ID, "versions: " + vSet);
+    LOG.logDebug("getSets-"+ID, "versions: " + vSet);
     return vSet;
   }
 
@@ -88,7 +88,7 @@ public class LocalMasterManager extends MasterManager implements Runnable
   public Map<String, Manifest> getSets(List<String> namesAllowed) throws ExecuteException
   {
     Map<String, Manifest> vSet = fileManager.getSets(namesAllowed, ID);
-    LOG.logInfo("getSets-"+ID, "versions: " + vSet);
+    LOG.logDebug("getSets-"+ID, "versions: " + vSet);
     return vSet;
   }
 

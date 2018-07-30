@@ -30,7 +30,7 @@ public class RemoteMasterManager extends MasterManager
 
   public void init() throws ExecuteException
   {
-    LOG.logInfo("init", "called");
+    LOG.logDebug("init", "called");
     host = getModel().getProperty(ConfigurationManager.ID+".MasterHost");
     if (host == null)
     {
@@ -40,12 +40,12 @@ public class RemoteMasterManager extends MasterManager
 
   public void start() throws ExecuteException
   {
-    LOG.logInfo("start", "called");
+    LOG.logDebug("start", "called");
   }
 
   public void stop()
   {
-    LOG.logInfo("stop", "called");
+    LOG.logDebug("stop", "called");
   }
 
   @Override

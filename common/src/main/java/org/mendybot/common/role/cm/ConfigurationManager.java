@@ -45,7 +45,7 @@ public class ConfigurationManager extends ApplicationRole implements Runnable
   @Override
   public void init() throws ExecuteException
   {
-    LOG.logInfo("init", "called");
+    LOG.logDebug("init", "called");
     t.setName(getClass().getSimpleName());
     t.setDaemon(true);
     if (master != null) 
@@ -63,7 +63,7 @@ public class ConfigurationManager extends ApplicationRole implements Runnable
   @Override
   public void start() throws ExecuteException
   {
-    LOG.logInfo("start", "called");
+    LOG.logDebug("start", "called");
     if (master != null) 
     {
       master.start();
@@ -74,7 +74,7 @@ public class ConfigurationManager extends ApplicationRole implements Runnable
   @Override
   public void stop()
   {
-    LOG.logInfo("stop", "called");
+    LOG.logDebug("stop", "called");
     if (master != null) 
     {
       master.stop();
@@ -86,19 +86,23 @@ public class ConfigurationManager extends ApplicationRole implements Runnable
   {
     running = master != null;
     while(running) {
+      if (fileManager == null) {
+        running = false;
+        continue;
+      }
       Map<String, Manifest> vSet = fileManager.getSets(ConfigurationManager.ID);
-      LOG.logInfo("run", "versions: " + vSet);
+      LOG.logDebug("run", "versions: " + vSet);
       try
       {
-        System.out.println("allowed: "+namesAllowed);
+        LOG.logDebug("run", "allowed: "+namesAllowed);
         Map<String, Manifest> masterSet = master.getSets(namesAllowed);
         
         
         boolean areSetsConsistent = vSet.toString().equals(masterSet.toString());
         if (!areSetsConsistent)
         {
-          LOG.logInfo("run", "master versions: " + masterSet);
-          LOG.logInfo("run", "consistent: " + areSetsConsistent);
+          LOG.logDebug("run", "master versions: " + masterSet);
+          LOG.logDebug("run", "consistent: " + areSetsConsistent);
           Map<String, Manifest> deltaNew = filterMissing(masterSet, vSet);
           LOG.logInfo("run", "need to grab: "+ConfigurationManager.ID+"<-"+deltaNew);
           master.requestAdd(ConfigurationManager.ID, fileManager, deltaNew);
