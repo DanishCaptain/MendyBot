@@ -19,20 +19,20 @@ public class TimekeeperWidget extends Widget
   @Override
   public void init() throws ExecuteException
   {
-    LOG.logInfo("init", "call");
+    LOG.logDebug("init", "call");
   }
 
   @Override
   public void start() throws ExecuteException
   {
-    LOG.logInfo("start", "call");
+    LOG.logDebug("start", "call");
 	  ticker.start();
   }
 
   @Override
   public void stop()
   {
-    LOG.logInfo("stop", "call");
+    LOG.logDebug("stop", "call");
     ticker.stop();
   }
 

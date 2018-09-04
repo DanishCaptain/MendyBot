@@ -7,7 +7,6 @@ import java.io.InputStreamReader;
 import java.util.List;
 
 import org.mendybot.common.application.log.Logger;
-import org.mendybot.common.role.cm.MasterManager;
 
 public class Watcher implements Runnable
 {
@@ -29,9 +28,11 @@ public class Watcher implements Runnable
     String line;
     try
     {
-      while((line = br.readLine()) != null)
-      {
-        list.add(line);
+      if (br.ready()) {
+        while((line = br.readLine()) != null)
+        {
+          list.add(line);
+        }
       }
     }
     catch (IOException e)

@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.TimeZone;
 
 import org.mendybot.common.application.Application;
 import org.mendybot.common.application.log.Logger;
@@ -36,6 +37,7 @@ public class ApplicationModel
   private File dirEtc;
   private File dirOpt;
   private ApplicationPlatform applicationPlatform;
+  private TimeZone timeZone;
 
   public ApplicationModel(Application application) throws ExecuteException
   {
@@ -76,6 +78,12 @@ public class ApplicationModel
       
     } else {
       throw new ExecuteException("mendy-config.properties file is missing.");
+    }
+    String tzId = config.getProperty("timezone");
+    if (tzId == null) {
+      timeZone = TimeZone.getDefault();      
+    } else {
+      timeZone = TimeZone.getTimeZone(tzId);
     }
   }
 
@@ -190,7 +198,7 @@ public class ApplicationModel
 
       for (int i=0; i<names.size(); i++)
       {
-        String name = names.remove(i);
+        String name = names.get(i);
         String className = classNames.get(i);
         @SuppressWarnings("unchecked")
         Class<? extends Widget> c = (Class<? extends Widget>) Class.forName(className);
@@ -351,5 +359,10 @@ public class ApplicationModel
   public List<Widget> getWidgets()
   {
     return this.widgetsL;
+  }
+
+  public TimeZone getTimeZone()
+  {
+    return timeZone;
   }
 }

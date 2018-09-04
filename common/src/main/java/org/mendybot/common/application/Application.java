@@ -111,6 +111,8 @@ public final class Application
         LOG.logSevere("main",e);
         System.exit(ERROR_EXIT);
       }
+      Thread.yield();
+      WeatherFucker f = new WeatherFucker();
     } else {
       try
       {

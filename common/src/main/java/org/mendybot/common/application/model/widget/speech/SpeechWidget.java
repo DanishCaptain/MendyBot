@@ -19,13 +19,13 @@ public SpeechWidget(ApplicationModel model, String name)
 @Override
 public void init() throws ExecuteException
 {
-  LOG.logInfo("init", "call");
+  LOG.logDebug("init", "call");
 }
 
 @Override
 public void start() throws ExecuteException
 {
-  LOG.logInfo("start", "call");
+  LOG.logDebug("start", "call");
     ticker.start();
     ticker.addPhrase("Greetings Captain");
 }
@@ -33,7 +33,7 @@ public void start() throws ExecuteException
 @Override
 public void stop()
 {
-  LOG.logInfo("stop", "call");
+  LOG.logDebug("stop", "call");
   ticker.stop();
 }
 

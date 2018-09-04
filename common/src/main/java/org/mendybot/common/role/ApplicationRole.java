@@ -12,7 +12,7 @@ public abstract class ApplicationRole implements MendyBotRole
 	  public ApplicationRole(ApplicationModel model, String id) {
 	    this.model = model;
 	    this.id = id;
-	    LOG.logInfo("()", "loaded: "+getClass().getName());
+	    LOG.logDebug("()", "loaded: "+getClass().getName());
 	  }
 	  
 	  public ApplicationModel getModel()

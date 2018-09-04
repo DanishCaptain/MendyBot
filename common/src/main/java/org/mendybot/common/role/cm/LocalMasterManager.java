@@ -7,6 +7,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -21,14 +22,14 @@ import org.mendybot.common.role.archive.ManifestEntry;
 public class LocalMasterManager extends MasterManager implements Runnable
 {
   private static final Logger LOG = Logger.getInstance(LocalMasterManager.class);
-  public static final int PORT = 3000;
+  //public static final int PORT = 3000;
+  public static final int PORT = 3001;
   public static final String ID = "CMMM";
   public static final byte COMMAND_GET_SET_LIST = 10;
   public static final byte COMMAND_GET_SET_LIST_ALLOWED_RESTRICTED = 11;
   public static final byte COMMAND_FILE_REQUEST = 20;
   private Thread t = new Thread(this);
   private File workDir;
-  // private File masterDir;
   private FileManager fileManager;
   private boolean running;
   private ServerSocket ss;
@@ -87,9 +88,14 @@ public class LocalMasterManager extends MasterManager implements Runnable
   @Override
   public Map<String, Manifest> getSets(List<String> namesAllowed) throws ExecuteException
   {
-    Map<String, Manifest> vSet = fileManager.getSets(namesAllowed, ID);
-    LOG.logDebug("getSets-"+ID, "versions: " + vSet);
-    return vSet;
+    if (fileManager != null) {
+      Map<String, Manifest> vSet = fileManager.getSets(namesAllowed, ID);
+      LOG.logDebug("getSets-"+ID, "versions: " + vSet);
+      return vSet;
+    } else {
+      LOG.logInfo("getSets-"+ID, "no file manager for set processing");
+      return new HashMap<>();
+    }
   }
 
   @Override
@@ -126,7 +132,7 @@ public class LocalMasterManager extends MasterManager implements Runnable
       try
       {
         Socket socket = ss.accept();
-        System.out.println("got LocalMasterManager.cm.call");
+        System.out.println("got LocalMasterManager.cm.call - "+socket.getInetAddress());
         ObjectOutputStream os = new ObjectOutputStream(socket.getOutputStream());
         ObjectInputStream is = new ObjectInputStream(socket.getInputStream());
         byte command = (byte) is.read();

@@ -113,7 +113,8 @@ public class ConfigurationManager extends ApplicationRole implements Runnable
       }
       catch (ExecuteException e)
       {
-        LOG.logSevere("run", e);
+        LOG.logSevere("run", e.getMessage());
+        LOG.logDebug("run", e);
       }
       try
       {

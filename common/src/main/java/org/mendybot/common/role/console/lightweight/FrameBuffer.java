@@ -13,6 +13,8 @@ import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 import java.util.concurrent.ArrayBlockingQueue;
 
+import org.mendybot.common.application.log.Logger;
+
 /**
  * This class is the Java front end for a simple to use FrameBuffer driver.
  * Simple draw in the BufferedImage and all changes are transfered to the
@@ -48,7 +50,7 @@ import java.util.concurrent.ArrayBlockingQueue;
  */
 public class FrameBuffer
 {
-
+  private Logger LOG = Logger.getInstance(FrameBuffer.class);
 
   private String deviceName;
 
@@ -125,10 +127,10 @@ public class FrameBuffer
     this.width = getDeviceWidth(deviceInfo);
     this.height = getDeviceHeight(deviceInfo);
 
-    System.err.println("Open with " + deviceName + " (" + deviceInfo + ")");
-    System.err.println("  width   " + getDeviceWidth(deviceInfo));
-    System.err.println("  height  " + getDeviceHeight(deviceInfo));
-    System.err.println("  bpp     " + getDeviceBitsPerPixel(deviceInfo));
+    LOG.logDebug("FrameBuffer()", "Open with " + deviceName + " (" + deviceInfo + ")");
+    LOG.logDebug("FrameBuffer()", "  width   " + getDeviceWidth(deviceInfo));
+    LOG.logDebug("FrameBuffer()", "  height  " + getDeviceHeight(deviceInfo));
+    LOG.logDebug("FrameBuffer()", "  bpp     " + getDeviceBitsPerPixel(deviceInfo));
 
     // We always use ARGB image type.
     img = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);

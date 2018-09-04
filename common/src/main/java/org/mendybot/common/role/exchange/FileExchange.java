@@ -26,19 +26,19 @@ public class FileExchange extends ApplicationRole
   @Override
   public void init() throws ExecuteException
   {
-    LOG.logInfo("init", "called");
+    LOG.logDebug("init", "called");
   }
 
   @Override
   public void start() throws ExecuteException
   {
-    LOG.logInfo("start", "called");
+    LOG.logDebug("start", "called");
   }
 
   @Override
   public void stop()
   {
-    LOG.logInfo("stop", "called");
+    LOG.logDebug("stop", "called");
   }
 
 }

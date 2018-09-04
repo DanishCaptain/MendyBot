@@ -25,8 +25,8 @@ public class HeavyWeightConsole extends ConsoleRole implements WindowListener
     super(model);
     frame = new JFrame(model.getName());
     Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
-//    main = new OnscreenImagePanel(d.width, d.height);
-    main = new OnscreenImagePanel(480, 320);
+    main = new OnscreenImagePanel(d.width, d.height);
+//    main = new OnscreenImagePanel(480, 320);
     frame.setContentPane(main);
     frame.pack();
 //    frame.setAlwaysOnTop(true);

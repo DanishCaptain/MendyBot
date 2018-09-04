@@ -25,10 +25,9 @@ public abstract class Clip
     return name;
   }
 
-  public String getWIdgetName()
+  public String getWidgetName()
   {
     return widgetName;
   }
 
-  public abstract void play();
 }

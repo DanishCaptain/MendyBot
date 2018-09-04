@@ -1,0 +1,14 @@
+{
+dt=1533441480, 
+coord={"lon":-111.99,"lat":33.46}, 
+visibility=16093, 
+weather=[{"icon":"01n","description":"clear sky","main":"Clear","id":800}], 
+name=Phoenix, 
+cod=200, 
+main={"temp":312.48,"temp_min":311.15,"humidity":16,"pressure":1006,"temp_max":314.15}, 
+clouds={"all":1}, 
+id=420001060, 
+sys={"country":"US","sunrise":1533473010,"sunset":1533522232,"id":291,"type":1,"message":0.004}, 
+base=stations, 
+wind={"deg":250,"speed":3.1}
+}

@@ -36,7 +36,7 @@ public abstract class ConsoleRole implements MendyBotRole
 
   public final void init() throws ExecuteException
   {
-    LOG.logInfo("init", "call");
+    LOG.logDebug("init", "call");
     initClips(clipsM, clipsL);
     initGlyphs(glyphsM, glyphsL);
     initConsole();
@@ -64,7 +64,7 @@ public abstract class ConsoleRole implements MendyBotRole
       for (int i=0; i<names.size(); i++)
       {
         String name = names.get(i);
-        LOG.logInfo("initClips", name);
+        LOG.logDebug("initClips", name);
         String widgetName = widgetNames.get(i);
         String className = classNames.get(i);
         @SuppressWarnings("unchecked")
@@ -97,7 +97,7 @@ public abstract class ConsoleRole implements MendyBotRole
       for (int i=0; i<names.size(); i++)
       {
         String name = names.get(i);
-        LOG.logInfo("initGlyphs", name);
+        LOG.logDebug("initGlyphs", name);
         String widgetName = widgetNames.get(i);
         String className = classNames.get(i);
         @SuppressWarnings("unchecked")
@@ -122,10 +122,14 @@ public abstract class ConsoleRole implements MendyBotRole
   public void repaint()
   {
     BufferedImage image = getImage();
+    if (image == null)
+    {
+      return;
+    }
     synchronized(image) {
       Graphics g = image.getGraphics();
     g.setColor(Color.BLACK);
-    g.fillRect(0, 0, image.getWidth(), image.getHeight());
+//    g.fillRect(0, 0, image.getWidth(), image.getHeight());
     
     for (Glyph gg : glyphsL)
     {

@@ -27,8 +27,10 @@ public class ManualRepaintThread extends Thread
       while (deviceInfo != 0)
       {
 
-        fb.getRepaintQueue().take();
-        fb.updateScreen();
+        Boolean tf = fb.getRepaintQueue().take();
+        if (tf) {
+//          fb.updateScreen();
+        }
 
         sleep(SLEEP_TIME);
 

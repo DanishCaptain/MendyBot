@@ -25,7 +25,7 @@ public class ScreenPanel extends JPanel
   {
     synchronized (fb.getUpdateLockForSync())
     {
-      super.paintComponent(g);
+      //super.paintComponent(g);
       BufferedImage img = fb.getImage();
 
       int w = this.getWidth();

@@ -80,10 +80,7 @@ public class MulticastTransmitter implements Runnable
       }
       catch (IOException e)
       {
-        // TODO what to do
-        
-        
-        LOG.logWarning("run", e);
+        LOG.logWarning("run", e.getMessage());
       }
       try
       {

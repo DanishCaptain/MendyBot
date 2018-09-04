@@ -7,6 +7,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -189,7 +190,8 @@ public class RemoteMasterManager extends MasterManager
     }
     catch (Exception e)
     {
-      throw new ExecuteException(e);
+      LOG.logWarning("getSets", host+"::"+e.getMessage());
+      return new HashMap<>();
     }
     finally
     {

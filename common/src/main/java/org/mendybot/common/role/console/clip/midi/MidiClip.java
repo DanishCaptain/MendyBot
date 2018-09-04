@@ -11,9 +11,4 @@ public class MidiClip extends Clip// implements ClockListener
 	  super(console, name, widgetName);
   }
   
-  @Override
-  public void play()
-  {
-  }
-
 }

@@ -26,30 +26,35 @@ public class FileManager extends ApplicationRole
       workDir.mkdirs();
     }
   }
+  
+  public File getWorkDirectory()
+  {
+    return workDir;
+  }
 
   @Override
   public void init() throws ExecuteException
   {
-    LOG.logInfo("init", "called");
+    LOG.logDebug("init", "called");
   }
 
   @Override
   public void start() throws ExecuteException
   {
-    LOG.logInfo("start", "called");
+    LOG.logDebug("start", "called");
   }
 
   @Override
   public void stop()
   {
-    LOG.logInfo("stop", "called");
+    LOG.logDebug("stop", "called");
   }
 
   public void initContext(String id)
   {
-    LOG.logInfo("initContext", "id: "+id);
+    LOG.logDebug("initContext", "id: "+id);
     File c = new File(workDir, id);
-    LOG.logInfo("initContext", "file: "+c.getPath());
+    LOG.logDebug("initContext", "file: "+c.getPath());
     LOG.logInfo("initContext", "exists: "+c.exists());
     if (!c.exists())
     {
@@ -68,10 +73,12 @@ public class FileManager extends ApplicationRole
       for (File d : dirs) {
         Manifest m = new Manifest(d.getName());
         File[] entries = d.listFiles();
-        for (File e : entries) {
-          ManifestEntry me = new ManifestEntry(e.getName());
-          me.setLastModified(e.lastModified());
-          m.add(me);
+        if (entries != null) {
+          for (File e : entries) {
+            ManifestEntry me = new ManifestEntry(e.getName());
+            me.setLastModified(e.lastModified());
+            m.add(me);
+          }
         }
         map.put(m.getName(), m);
       }
@@ -129,7 +136,7 @@ public class FileManager extends ApplicationRole
     int result = ct.call();
     temp.renameTo(mEntry);
     mEntry.setLastModified(lastModified);
-    LOG.logInfo("copyTo", result+"::"+mEntry.exists());
+    LOG.logDebug("copyTo", result+"::"+mEntry.exists());
     
   }
   
@@ -149,7 +156,7 @@ public class FileManager extends ApplicationRole
     if (mDir.listFiles().length == 0) {
       mDir.delete();
     }
-    LOG.logInfo("fileRemoved", result+"::"+mEntry.exists());
+    LOG.logDebug("remove", result+"::"+mEntry.exists());
     
   }
   

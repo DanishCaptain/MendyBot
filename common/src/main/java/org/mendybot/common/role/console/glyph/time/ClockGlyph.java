@@ -27,6 +27,7 @@ public class ClockGlyph extends Glyph implements ClockListener
   private int ww;
   private int hh;
   private boolean initialized;
+  private Date archiveDate;
 
   public ClockGlyph(ConsoleRole console, String name, String widgetName)
   {
@@ -72,6 +73,10 @@ public class ClockGlyph extends Glyph implements ClockListener
       
       initialized = true;
     }
+    if (archiveDate == date) {
+      return;
+    }
+    archiveDate = date;
     String text0 = getName()+" - "+sdf2.format(date)+" - "+sdf0.format(date);    
     String text1 = sdf1.format(date);
     int textHeight1 = g.getFontMetrics(font1).getHeight();
